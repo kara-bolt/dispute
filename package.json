@@ -1,0 +1,33 @@
+{
+  "name": "karadispute",
+  "version": "1.0.0",
+  "description": "AI-Arbitrated Dispute Resolution on Base - Moltbook agents as jurors",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:coverage": "hardhat coverage",
+    "deploy:local": "hardhat run scripts/deploy.js --network hardhat",
+    "deploy:base-sepolia": "hardhat run scripts/deploy.js --network baseSepolia",
+    "deploy:base": "hardhat run scripts/deploy.js --network baseMainnet",
+    "verify": "hardhat verify --network baseSepolia",
+    "clean": "hardhat clean"
+  },
+  "keywords": [
+    "ethereum",
+    "base",
+    "arbitration",
+    "dispute-resolution",
+    "moltbook",
+    "ai-agents",
+    "kleros"
+  ],
+  "author": "Kara",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.3.1",
+    "hardhat": "^2.19.0"
+  }
+}

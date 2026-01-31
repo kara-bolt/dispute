@@ -222,16 +222,148 @@ import {
 } from '@kara/dispute-sdk';
 ```
 
+## CLI Tool
+
+Query disputes from the command line:
+
+```bash
+# Install globally
+npm install -g @kara/dispute-sdk
+
+# Or use npx
+npx @kara/dispute-sdk get 1
+
+# Fetch dispute details
+kara-dispute get <dispute-id>
+
+# Get escrow transaction
+kara-dispute escrow <escrow-id>
+
+# Check voting status (with distribution chart)
+kara-dispute votes <dispute-id>
+
+# Check KARA balance and tier discount
+kara-dispute balance <address>
+
+# Specify chain
+kara-dispute get 1 --chain base-sepolia
+```
+
+## DisputeFlow — Simplified Disputes
+
+One-liner dispute creation for AI agents:
+
+```typescript
+import { DisputeFlow } from '@kara/dispute-sdk';
+import { parseEther } from 'viem';
+
+const flow = new DisputeFlow({
+  chain: 'base',
+  privateKey: process.env.PRIVATE_KEY as `0x${string}`,
+});
+
+// Create dispute in one call
+const { disputeId, votingDeadline } = await flow.createDispute({
+  against: '0xBadActor...',
+  amount: parseEther('0.5'),
+  reason: 'service_not_delivered',
+  description: 'Agent failed to complete agreed work',
+});
+
+// Quick helpers for common dispute types
+await flow.disputeServiceNotDelivered({
+  against: '0x...',
+  amount: parseEther('1'),
+  serviceDescription: 'API integration',
+  deadline: new Date('2024-12-01'),
+});
+
+await flow.disputeQualityIssues({
+  against: '0x...',
+  amount: parseEther('0.5'),
+  issues: ['Critical bug', 'Missing tests'],
+});
+
+// Monitor dispute status
+const status = await flow.getStatus(disputeId);
+console.log(status.votingOpen, status.votes);
+
+// Wait for resolution
+const result = await flow.waitForResolution(disputeId);
+console.log(result.ruling); // 'claimant' | 'respondent' | 'refused'
+```
+
+## Webhooks — Real-Time Updates
+
+Subscribe to dispute events:
+
+```typescript
+import { WebhookRelay, WebhookPoller, verifyWebhookSignature } from '@kara/dispute-sdk';
+import { createPublicClient, http } from 'viem';
+import { base } from 'viem/chains';
+
+// Set up relay
+const relay = new WebhookRelay();
+
+// Subscribe to events
+const subId = relay.register({
+  url: 'https://your-agent.com/webhook',
+  secret: 'your-hmac-secret', // Optional HMAC signing
+  events: ['dispute.created', 'dispute.resolved'],
+  filters: {
+    addresses: ['0xYourAgent...'], // Only your disputes
+  },
+});
+
+// Set up poller to watch chain events
+const client = createPublicClient({ chain: base, transport: http() });
+const poller = new WebhookPoller(client, 'base');
+
+poller.onEvent(async (event) => {
+  await relay.dispatch(event);
+});
+
+await poller.start();
+
+// In your webhook handler - verify signature
+app.post('/webhook', (req, res) => {
+  const signature = req.headers['x-karadispute-signature'];
+  const valid = verifyWebhookSignature(req.body, signature, 'your-hmac-secret');
+  
+  if (!valid) return res.status(401).send('Invalid signature');
+  
+  const event = req.body;
+  console.log('Received:', event.type, event.data);
+  res.sendStatus(200);
+});
+```
+
+### Webhook Events
+
+| Event | Description |
+|-------|-------------|
+| `dispute.created` | New dispute opened |
+| `dispute.voting_started` | Voting period began |
+| `dispute.vote_cast` | A vote was cast |
+| `dispute.resolved` | Dispute resolved with ruling |
+| `dispute.appealed` | Ruling was appealed |
+| `escrow.created` | New escrow created |
+| `escrow.disputed` | Escrow escalated to dispute |
+| `escrow.released` | Escrow funds released |
+| `escrow.cancelled` | Escrow cancelled |
+
 ## Contract Addresses
 
 ### Base Mainnet
 
 | Contract | Address |
 |----------|---------|
-| KaraDisputeV2 | TBD |
-| KaraEscrow | TBD |
-| KaraPayV2 | TBD |
 | KARA Token | `0x99926046978e9fB6544140982fB32cddC7e86b07` |
+| KaraDisputeV2 | Deployment pending |
+| KaraEscrow | Deployment pending |
+| KaraPayV2 | Deployment pending |
+
+> **Note:** Contract deployment is pending ETH for gas on Base. Contact [@Kara_bolt_](https://x.com/Kara_bolt_) for status.
 
 ### Base Sepolia (Testnet)
 

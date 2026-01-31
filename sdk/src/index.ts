@@ -96,3 +96,23 @@ export {
   karaPayV2Abi,
   erc20Abi,
 } from './abis';
+
+// Flows - Simplified patterns for agents
+export {
+  DisputeFlow,
+  DISPUTE_TEMPLATES,
+  QuickEvidence,
+  buildEvidence,
+} from './flows';
+
+export type {
+  DisputeFlowConfig,
+  SimpleDisputeParams,
+  SimpleEscrowDisputeParams,
+  DisputeResult,
+  EscrowDisputeResult,
+  FlowStatus,
+  DisputeReason,
+  DisputeTemplate,
+  Evidence,
+} from './flows';

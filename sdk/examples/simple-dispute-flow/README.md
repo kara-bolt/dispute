@@ -1,146 +1,122 @@
-# Simple Dispute Creation Flow
+# Simple Dispute Flow Example
 
-Minimal, copy-paste-ready examples for AI agents to create and manage disputes.
+Dead-simple dispute creation for AI agents. One method, done.
 
-## Overview
+## Why This Exists
 
-Three scenarios covered:
-
-1. **Escrow Dispute** - Buyer creates escrow, seller doesn't deliver, buyer disputes
-2. **Direct Dispute** - Agent creates dispute directly (no escrow)
-3. **Monitor Dispute** - Poll dispute status until resolution
+The base SDK is powerful but verbose. This flow wrapper gives you:
+- **One-liner dispute creation** with smart defaults
+- **Pre-built templates** for common scenarios
+- **Quick evidence builders** for structured claims
+- **Status monitoring** with human-readable output
 
 ## Quick Start
 
-```bash
-# Install
-npm install
+```typescript
+import { DisputeFlow } from '@kara/dispute-sdk';
+import { parseEther } from 'viem';
 
-# Run the combined demo
-npm run demo
+// Initialize with private key
+const flow = new DisputeFlow({
+  chain: 'base',
+  privateKey: process.env.PRIVATE_KEY as `0x${string}`,
+});
 
-# Or run individual flows
-npm run escrow-dispute    # Escrow → Dispute flow
-npm run direct-dispute    # Direct dispute creation
-npm run monitor          # Monitor existing dispute
+// Create dispute in one line
+const { disputeId } = await flow.createDispute({
+  against: '0xBadActor...',
+  amount: parseEther('0.5'),
+  reason: 'service_not_delivered',
+  description: 'Agent failed to complete agreed task by deadline',
+});
+
+console.log(`Dispute created: ${disputeId}`);
 ```
 
-## Flow 1: Escrow Dispute
+## Available Templates
 
-```
-┌─────────────┐      ┌──────────────┐      ┌─────────────┐
-│ Create      │      │ Wait for     │      │ Raise       │
-│ Escrow      │─────▶│ Delivery     │─────▶│ Dispute     │
-│             │      │ (or timeout) │      │             │
-└─────────────┘      └──────────────┘      └─────────────┘
-                                                  │
-                                                  ▼
-                     ┌──────────────┐      ┌─────────────┐
-                     │ Get          │      │ Arbitrators │
-                     │ Resolution   │◀─────│ Vote        │
-                     │              │      │             │
-                     └──────────────┘      └─────────────┘
-```
+| Reason | When to Use |
+|--------|-------------|
+| `service_not_delivered` | Provider didn't deliver anything |
+| `quality_issues` | Delivered work has problems |
+| `partial_delivery` | Only part of work delivered |
+| `deadline_missed` | Work delivered late |
+| `scope_dispute` | Disagreement on what was agreed |
+| `payment_dispute` | Payment terms disagreement |
+| `fraud` | Intentional misrepresentation |
+| `other` | Custom dispute |
 
-**When to use:** Payment scenarios where you want protection before sending funds.
+## Quick Methods
 
-## Flow 2: Direct Dispute
-
-```
-┌─────────────┐      ┌──────────────┐      ┌─────────────┐
-│ Prepare     │      │ Create       │      │ Monitor     │
-│ Evidence    │─────▶│ Dispute      │─────▶│ Status      │
-│             │      │ (pay KARA)   │      │             │
-└─────────────┘      └──────────────┘      └─────────────┘
-```
-
-**When to use:** Off-chain agreements that need on-chain resolution.
-
-## Flow 3: Monitor Dispute
-
-```
-┌─────────────┐      ┌──────────────┐      ┌─────────────┐
-│ Get         │      │ Check        │      │ Execute     │
-│ Dispute     │─────▶│ Resolution   │─────▶│ Ruling      │
-│             │      │ (poll)       │      │ (if won)    │
-└─────────────┘      └──────────────┘      └─────────────┘
-```
-
-## Evidence Format
-
-Structure your evidence JSON for maximum clarity:
+For common scenarios, use the quick methods:
 
 ```typescript
-const evidence = {
-  // What happened
-  title: "Non-delivery of service",
-  description: "Agreed to deliver within 24h, no delivery after 7 days",
-  
-  // Timeline
-  timeline: [
-    { date: "2024-01-01", event: "Agreement made", proof: "ipfs://..." },
-    { date: "2024-01-02", event: "Payment sent", proof: "0x..." },
-    { date: "2024-01-09", event: "Dispute filed", proof: null },
-  ],
-  
-  // Supporting documents (IPFS hashes)
-  attachments: [
-    { name: "chat_logs.pdf", cid: "Qm..." },
-    { name: "agreement.pdf", cid: "Qm..." },
-  ],
-  
-  // What you want
-  requestedOutcome: "Full refund of 0.1 ETH",
-  amount: "100000000000000000", // in wei
-};
+// Service not delivered
+await flow.disputeServiceNotDelivered({
+  against: '0x...',
+  amount: parseEther('1'),
+  serviceDescription: 'Analyze 500 documents',
+  deadline: new Date('2024-01-15'),
+});
+
+// Quality issues
+await flow.disputeQualityIssues({
+  against: '0x...',
+  amount: parseEther('0.5'),
+  issues: ['Missing error handling', 'No tests', 'Crashes on large inputs'],
+});
+
+// Partial delivery
+await flow.disputePartialDelivery({
+  against: '0x...',
+  amount: parseEther('0.3'),
+  deliveredPercentage: 40,
+  missingItems: ['API documentation', 'Test suite', 'Deployment guide'],
+});
 ```
 
-## Gas Estimates
+## Disputing Escrow Transactions
 
-| Action | Estimated Gas | ~Cost (Base L2) |
-|--------|--------------|-----------------|
-| Create Escrow | 150,000 | ~$0.02 |
-| Raise Dispute | 200,000 | ~$0.03 |
-| Direct Dispute | 180,000 | ~$0.02 |
-| Appeal | 100,000 | ~$0.01 |
-| Resolve | 80,000 | ~$0.01 |
-
-## KARA Token Discounts
-
-Hold KARA tokens to reduce dispute fees:
-
-| KARA Held | Discount |
-|-----------|----------|
-| 100+ | 5% |
-| 1,000+ | 10% |
-| 10,000+ | 20% |
-| 100,000+ | 30% |
-
-## Error Handling
+If you have an existing escrow, dispute it directly:
 
 ```typescript
-try {
-  const { disputeId } = await client.agentCreateDispute({...});
-} catch (error) {
-  if (error.message.includes('InsufficientKara')) {
-    // Need more KARA tokens
-  } else if (error.message.includes('DisputeAlreadyExists')) {
-    // Already disputed this escrow
-  } else if (error.message.includes('DeadlineNotPassed')) {
-    // Can't dispute yet - escrow still active
-  }
-  throw error;
+const { disputeId, escrow } = await flow.disputeEscrow({
+  escrowId: 123n,
+  reason: 'quality_issues',
+  description: 'Code has critical security vulnerabilities',
+});
+
+console.log(`Disputing escrow ${escrow.amount} from ${escrow.payer}`);
+```
+
+## Monitoring Disputes
+
+```typescript
+// Get status
+const status = await flow.getStatus(disputeId);
+console.log(`Status: ${status.statusText}`);
+console.log(`Votes: ${status.votes.forClaimant} for, ${status.votes.forRespondent} against`);
+
+// Wait for resolution
+const result = await flow.waitForResolution(disputeId, {
+  pollIntervalMs: 60_000, // Check every minute
+  timeoutMs: 7 * 24 * 60 * 60 * 1000, // 7 day timeout
+});
+
+if (result.ruling === 'claimant') {
+  console.log('You won! Funds returned.');
 }
+```
+
+## Running the Example
+
+```bash
+cd examples/simple-dispute-flow
+npm install
+PRIVATE_KEY=0x... npx tsx run.ts
 ```
 
 ## Files
 
-- `dispute-flow.ts` - Combined demo showing all flows
-- `escrow-dispute.ts` - Escrow → Dispute example
-- `direct-dispute.ts` - Direct dispute example  
-- `monitor-dispute.ts` - Dispute monitoring example
-- `utils.ts` - Shared utilities
-
-## License
-
-MIT
+- `run.ts` - Full example showing all features
+- `quick-dispute.ts` - Minimal one-liner example

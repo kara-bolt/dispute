@@ -1,0 +1,28 @@
+{
+  "name": "@kara/agent-payment-example",
+  "version": "0.1.0",
+  "description": "Example: Agent A pays Agent B via KaraPay escrow",
+  "type": "module",
+  "scripts": {
+    "start": "tsx run-scenario.ts",
+    "happy": "tsx run-scenario.ts happy",
+    "dispute": "tsx run-scenario.ts dispute",
+    "batch": "tsx run-scenario.ts batch",
+    "buyer": "tsx buyer-agent.ts",
+    "seller": "tsx seller-agent.ts"
+  },
+  "dependencies": {
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
+  },
+  "keywords": [
+    "ai-agents",
+    "escrow",
+    "payments",
+    "karadispute",
+    "base"
+  ]
+}

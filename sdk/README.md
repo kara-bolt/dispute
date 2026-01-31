@@ -237,11 +237,16 @@ import {
 
 Coming soon.
 
+## Documentation
+
+- **[API Reference](./docs/API.md)** - Complete method documentation
+- **[Integration Guide](./docs/INTEGRATION.md)** - Step-by-step agent integration
+- **[Examples](./docs/EXAMPLES.md)** - Ready-to-use code samples
+
 ## Links
 
 - [KaraDispute Contracts](https://github.com/kara-bolt/dispute)
 - [$KARA Token](https://basescan.org/token/0x99926046978e9fB6544140982fB32cddC7e86b07)
-- [Documentation](https://docs.kara.finance/dispute)
 
 ## License
 

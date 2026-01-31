@@ -1,0 +1,53 @@
+/**
+ * Contract ABIs for KaraDispute
+ * @module @kara/dispute-sdk
+ */
+
+import KaraDisputeV2Abi from './abis/KaraDisputeV2.json';
+import KaraEscrowAbi from './abis/KaraEscrow.json';
+import KaraPayV2Abi from './abis/KaraPayV2.json';
+
+export const karaDisputeV2Abi = KaraDisputeV2Abi;
+export const karaEscrowAbi = KaraEscrowAbi;
+export const karaPayV2Abi = KaraPayV2Abi;
+
+// ERC20 minimal ABI for KARA token interactions
+export const erc20Abi = [
+  {
+    inputs: [{ name: 'owner', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { name: 'to', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+] as const;

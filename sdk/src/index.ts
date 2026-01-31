@@ -116,3 +116,33 @@ export type {
   DisputeTemplate,
   Evidence,
 } from './flows';
+
+// Webhooks - Event polling and forwarding
+export {
+  WebhookPoller,
+  WebhookRelay,
+  verifyWebhookSignature,
+} from './webhooks';
+
+export type {
+  WebhookEventType,
+  WebhookEventBase,
+  WebhookEvent,
+  DisputeCreatedEvent,
+  DisputeVotingStartedEvent,
+  DisputeVoteCastEvent,
+  DisputeResolvedEvent,
+  DisputeAppealedEvent,
+  EscrowCreatedEvent,
+  EscrowFundedEvent,
+  EscrowDisputedEvent,
+  EscrowReleasedEvent,
+  EscrowCancelledEvent,
+  WebhookSubscription,
+  WebhookDelivery,
+  WebhookHandler,
+  WebhookHandlers,
+  WebhookPollerConfig,
+  WebhookRelayConfig,
+  RegisterWebhookParams,
+} from './webhooks';

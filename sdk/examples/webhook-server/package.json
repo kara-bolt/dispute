@@ -1,0 +1,16 @@
+{
+  "name": "webhook-server-example",
+  "version": "1.0.0",
+  "description": "KaraDispute webhook server example",
+  "type": "module",
+  "scripts": {
+    "start": "tsx run.ts",
+    "verify": "tsx verify.ts"
+  },
+  "dependencies": {
+    "@kara/dispute-sdk": "file:../.."
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0"
+  }
+}

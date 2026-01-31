@@ -232,6 +232,7 @@ export class DisputeFlow {
     
     // Create the dispute
     const result = await this.writer.agentCreateDispute({
+      from: myAddress,
       counterparty: params.against,
       amount: params.amount,
       description: params.description || template.description,
@@ -243,7 +244,7 @@ export class DisputeFlow {
     
     return {
       disputeId: result.disputeId,
-      txHash: result.receipt.hash,
+      txHash: result.hash,
       evidenceUri,
       votingDeadline: new Date(Number(dispute.votingDeadline) * 1000),
       dispute,
@@ -268,7 +269,7 @@ export class DisputeFlow {
     }
     
     // Get escrow details first
-    const escrow = await this.client.getTransaction(params.escrowId);
+    const escrow = await this.client.getEscrowTransaction(params.escrowId);
     if (!escrow) {
       throw new Error(`Escrow ${params.escrowId} not found`);
     }
@@ -302,7 +303,7 @@ export class DisputeFlow {
     
     return {
       disputeId: result.disputeId,
-      txHash: result.receipt.hash,
+      txHash: result.hash,
       evidenceUri,
       votingDeadline: new Date(Number(dispute.votingDeadline) * 1000),
       dispute,
@@ -399,7 +400,7 @@ export class DisputeFlow {
    */
   async getStatus(disputeId: bigint): Promise<FlowStatus> {
     const dispute = await this.client.getDispute(disputeId);
-    const votes = await this.client.getVotes(disputeId);
+    const votes = await this.client.getVoteResult(disputeId);
     
     const now = Math.floor(Date.now() / 1000);
     const deadline = Number(dispute.votingDeadline);

@@ -1,0 +1,20 @@
+{
+  "name": "@kara/simple-dispute-flow-example",
+  "version": "0.1.0",
+  "description": "Simple dispute creation flow for AI agents",
+  "type": "module",
+  "scripts": {
+    "demo": "npx tsx dispute-flow.ts",
+    "escrow-dispute": "npx tsx escrow-dispute.ts",
+    "direct-dispute": "npx tsx direct-dispute.ts",
+    "monitor": "npx tsx monitor-dispute.ts"
+  },
+  "dependencies": {
+    "@kara/dispute-sdk": "file:../..",
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
+  }
+}
